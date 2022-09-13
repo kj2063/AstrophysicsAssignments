@@ -1,0 +1,436 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "1. Download the Data1 and Random2\n",
+    "catalogues. The data points consists in ND galaxies from\n",
+    "SDSS DR7. The first three columns are the positions (in Mpc/h) and the last column is\n",
+    "the weight. We will forget about the weight here. The random catalogue contains uniformly\n",
+    "distributed points following the same survey shape. Since it is quite large, let us randomly\n",
+    "select NR = 3Ngal points."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>-4.3673441e+02</th>\n",
+       "      <th>1.2729111e+03</th>\n",
+       "      <th>1.1092042e+03</th>\n",
+       "      <th>6.1588812e-01</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>207245.000000</td>\n",
+       "      <td>207245.000000</td>\n",
+       "      <td>207245.000000</td>\n",
+       "      <td>207245.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>-1336.190301</td>\n",
+       "      <td>-241.381122</td>\n",
+       "      <td>687.169092</td>\n",
+       "      <td>0.202459</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>478.998901</td>\n",
+       "      <td>1208.424744</td>\n",
+       "      <td>536.154810</td>\n",
+       "      <td>0.113236</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-2540.740400</td>\n",
+       "      <td>-2337.768700</td>\n",
+       "      <td>-155.498370</td>\n",
+       "      <td>0.109613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>-1700.580900</td>\n",
+       "      <td>-1402.485100</td>\n",
+       "      <td>133.632030</td>\n",
+       "      <td>0.127004</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>-1359.077600</td>\n",
+       "      <td>-382.156000</td>\n",
+       "      <td>750.227890</td>\n",
+       "      <td>0.155137</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>-959.751420</td>\n",
+       "      <td>920.033980</td>\n",
+       "      <td>1164.621800</td>\n",
+       "      <td>0.241856</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>-162.354680</td>\n",
+       "      <td>2209.031000</td>\n",
+       "      <td>2070.940200</td>\n",
+       "      <td>2.357050</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       -4.3673441e+02  1.2729111e+03  1.1092042e+03  6.1588812e-01\n",
+       "count   207245.000000  207245.000000  207245.000000  207245.000000\n",
+       "mean     -1336.190301    -241.381122     687.169092       0.202459\n",
+       "std        478.998901    1208.424744     536.154810       0.113236\n",
+       "min      -2540.740400   -2337.768700    -155.498370       0.109613\n",
+       "25%      -1700.580900   -1402.485100     133.632030       0.127004\n",
+       "50%      -1359.077600    -382.156000     750.227890       0.155137\n",
+       "75%       -959.751420     920.033980    1164.621800       0.241856\n",
+       "max       -162.354680    2209.031000    2070.940200       2.357050"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "import ssl\n",
+    "\n",
+    "ssl._create_default_https_context = ssl._create_unverified_context\n",
+    "tables = pd.read_csv(\"https://bitbucket.org/csabiu/kstat2/raw/77989875594f72a521b20e2e7070429a41d5d216/example/test.gal\")\n",
+    "Data = pd.read_csv(\"https://bitbucket.org/csabiu/kstat2/raw/77989875594f72a521b20e2e7070429a41d5d216/example/test.gal\",delim_whitespace='True') # sep='\\b',\n",
+    "\n",
+    "Data.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>-1.5245353e+03</th>\n",
+       "      <th>2.3734192e+02</th>\n",
+       "      <th>1.0598991e+03</th>\n",
+       "      <th>1.2498690e-01</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>3.499985e+06</td>\n",
+       "      <td>3.499985e+06</td>\n",
+       "      <td>3.499985e+06</td>\n",
+       "      <td>3.499985e+06</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>-1.319909e+03</td>\n",
+       "      <td>-2.358549e+02</td>\n",
+       "      <td>6.821171e+02</td>\n",
+       "      <td>1.874112e-01</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>4.854787e+02</td>\n",
+       "      <td>1.226985e+03</td>\n",
+       "      <td>5.333671e+02</td>\n",
+       "      <td>9.019949e-02</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-2.540534e+03</td>\n",
+       "      <td>-2.343056e+03</td>\n",
+       "      <td>-1.590689e+02</td>\n",
+       "      <td>1.200992e-01</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>-1.691889e+03</td>\n",
+       "      <td>-1.425846e+03</td>\n",
+       "      <td>1.337097e+02</td>\n",
+       "      <td>1.252647e-01</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>-1.332170e+03</td>\n",
+       "      <td>-3.756794e+02</td>\n",
+       "      <td>7.332702e+02</td>\n",
+       "      <td>1.475979e-01</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>-9.375114e+02</td>\n",
+       "      <td>9.581864e+02</td>\n",
+       "      <td>1.154136e+03</td>\n",
+       "      <td>2.150418e-01</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>-1.576823e+02</td>\n",
+       "      <td>2.222463e+03</td>\n",
+       "      <td>2.103222e+03</td>\n",
+       "      <td>5.646779e-01</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       -1.5245353e+03  2.3734192e+02  1.0598991e+03  1.2498690e-01\n",
+       "count    3.499985e+06   3.499985e+06   3.499985e+06   3.499985e+06\n",
+       "mean    -1.319909e+03  -2.358549e+02   6.821171e+02   1.874112e-01\n",
+       "std      4.854787e+02   1.226985e+03   5.333671e+02   9.019949e-02\n",
+       "min     -2.540534e+03  -2.343056e+03  -1.590689e+02   1.200992e-01\n",
+       "25%     -1.691889e+03  -1.425846e+03   1.337097e+02   1.252647e-01\n",
+       "50%     -1.332170e+03  -3.756794e+02   7.332702e+02   1.475979e-01\n",
+       "75%     -9.375114e+02   9.581864e+02   1.154136e+03   2.150418e-01\n",
+       "max     -1.576823e+02   2.222463e+03   2.103222e+03   5.646779e-01"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ssl._create_default_https_context = ssl._create_unverified_context\n",
+    "tables = pd.read_csv(\"https://bitbucket.org/csabiu/kstat2/raw/77989875594f72a521b20e2e7070429a41d5d216/example/test.gal\")\n",
+    "rand_cat = pd.read_csv(\"https://bitbucket.org/csabiu/kstat2/raw/77989875594f72a521b20e2e7070429a41d5d216/example/test.ran\",delim_whitespace='True')\n",
+    "\n",
+    "rand_cat.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(207245, 3)\n",
+      "(621735, 3)\n"
+     ]
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "cho_rx = np.random.RandomState(111).choice(rand_cat[\"-1.5245353e+03\"], 207245*3, replace=False)\n",
+    "cho_ry = np.random.RandomState(111).choice(rand_cat[\"2.3734192e+02\"], 207245*3, replace=False)\n",
+    "cho_rz = np.random.RandomState(111).choice(rand_cat[\"1.0598991e+03\"], 207245*3, replace=False)\n",
+    "\n",
+    "data_arr = np.vstack((Data[\"-4.3673441e+02\"], Data[\"1.2729111e+03\"], Data[\"1.1092042e+03\"])).T\n",
+    "cho_rarr = np.vstack((cho_rx, cho_ry, cho_rz)).T\n",
+    "\n",
+    "print(data_arr.shape)\n",
+    "print(cho_rarr.shape)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "2. Using scipy.spatial.KDTree, build two trees: one tree containing the Data and and one\n",
+    "for the the Random catalogues. You will need a version >1.6. If you use google colab,\n",
+    "you will need to run !pip install scipy --upgrade and restart the kernel. use print\n",
+    "(scipy.__version__) to check your scipy version."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<scipy.spatial.kdtree.KDTree object at 0x7f38e6b3b1c8>\n",
+      "<scipy.spatial.kdtree.KDTree object at 0x7f38e58547c8>\n"
+     ]
+    }
+   ],
+   "source": [
+    "from scipy.spatial import KDTree\n",
+    "\n",
+    "data_tree = KDTree(data_arr[:100000])\n",
+    "rand_tree = KDTree(cho_rarr[:300000])\n",
+    "\n",
+    "print(data_tree)\n",
+    "print(rand_tree)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "3. Calculate the 2pcf using the following estimator of the 2pcf\n",
+    "ξ(r) = DD/\n",
+    "RR\n",
+    "− 1 (1)\n",
+    "for Nbin bins of separation r, where DD stands for the number of data-data pairs and RR\n",
+    "the number of Random-Random pairs. Note that DD and RR should be normalized by the\n",
+    "number of pairs ND,R(ND,R −1). The scipy.KDTree class has a method to count neighbours,\n",
+    "read the doc attentively! Note: you may want to do so with a smaller number of points at\n",
+    "first, say 100,000 galaxies and 300,000 random, and see the influence of the binning. When\n",
+    "you are satisfied, you can use the whole dataset."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 45,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "DD = 247558\n",
+      "RR = 448062\n",
+      "DR = 48572\n",
+      "\n",
+      "Xi = -0.44749164178171774\n"
+     ]
+    }
+   ],
+   "source": [
+    "#n = bins of separation r, bin radius\n",
+    "n = 10\n",
+    "\n",
+    "DD = data_tree.count_neighbors(data_tree,n)\n",
+    "RR = rand_tree.count_neighbors(rand_tree,n)\n",
+    "DR = data_tree.count_neighbors(rand_tree,n)\n",
+    "\n",
+    "Xi = DD/RR -1 \n",
+    "\n",
+    "print(\"DD =\", DD)\n",
+    "print(\"RR =\", RR)\n",
+    "print(\"DR =\", DR)\n",
+    "print(\"\\nXi =\", Xi )"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "4. Plot the correlation function. What can you say about it?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "5. (Bonus) On the same plot, plot error-bars using the Jackknife method to estimate the variance\n",
+    "in each bin. Note: since the number of"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "6. (Bonus) In practice, in cosmology, we do not use the natural estimator DD/RR − 1. One of\n",
+    "the most used estimators is the Landy & Szalay (1993) estimator\n",
+    "ξLS(r) = (DD − 2DR + RR)/\n",
+    "RR\n",
+    "− 1.\n",
+    "(2)\n",
+    "On the same plot, compare the LS estimator."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
